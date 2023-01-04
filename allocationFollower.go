@@ -38,18 +38,18 @@ type AllocationFollower struct {
 	Quit        chan bool
 	Ticker      *time.Ticker
 	log         Logger
-	logTag      string
+	skipLogTag  string
 }
 
 //NewAllocationFollower Creates a new allocation follower
-func NewAllocationFollower(nomad NomadConfig, logger Logger, logTag string) (a *AllocationFollower, e error) {
+func NewAllocationFollower(nomad NomadConfig, logger Logger, skipLogTag string) (a *AllocationFollower, e error) {
 	return &AllocationFollower{
 		Allocations: make(map[string]*FollowedAllocation),
 		Nomad:       nomad,
 		NodeID:      "",
 		Quit:        make(chan bool),
 		log:         logger,
-		logTag:      logTag,
+		skipLogTag:  skipLogTag,
 	}, nil
 }
 
@@ -240,7 +240,7 @@ func (a *AllocationFollower) collectAllocations(save *SavePoint) error {
 		runState := alloc.DesiredStatus == "run" || alloc.ClientStatus == "running"
 		if record == nil && runState {
 			// handle new alloc records w/ potentially saved state
-			falloc := NewFollowedAllocation(alloc, a.Nomad, a.OutChan, a.log, a.logTag)
+			falloc := NewFollowedAllocation(alloc, a.Nomad, a.OutChan, a.log, a.skipLogTag)
 			if save != nil {
 				a.log.Debug("AllocationFollower.collectAllocations", "Restoring saved allocations")
 				savedAlloc := save.SavedAllocs[alloc.ID]

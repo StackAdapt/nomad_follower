@@ -15,7 +15,7 @@ var DEFAULT_CIRCUIT_BREAK = 60 * time.Second
 var DEFAULT_LOG_FILE = "nomad.log"
 var DEFAULT_SAVE_FILE = "nomad-follower.json"
 
-var DEFAULT_LOG_TAG = "nomad_follower"
+var DEFAULT_SKIP_LOG_TAG = "disable_loki_logs"
 
 var MAX_LOG_SIZE = 50
 var MAX_LOG_BACKUPS = 1
@@ -47,9 +47,9 @@ func main() {
 		saveFile = DEFAULT_SAVE_FILE
 	}
 
-	logTag := os.Getenv("LOG_TAG")
-	if logTag == "" {
-		logTag = DEFAULT_LOG_TAG
+	skipLogTag := os.Getenv("SKIP_LOG_TAG")
+	if skipLogTag == "" {
+		skipLogTag = DEFAULT_SKIP_LOG_TAG
 	}
 
 	createLogFile(logFile, logger)
@@ -77,7 +77,7 @@ func main() {
 		)
 	}
 
-	af, err := NewAllocationFollower(nomadConfig, logger, logTag)
+	af, err := NewAllocationFollower(nomadConfig, logger, skipLogTag)
 	if err != nil {
 		logger.Errorf("main", "Error creating Allocation Follower: %s", err)
 		return

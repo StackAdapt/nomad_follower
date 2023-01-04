@@ -12,6 +12,7 @@ const RFC3339Milli = "2006-01-02T15:04:05.000Z07:00"
 
 // LogLevel provides compariable levels and a string representation.
 type LogLevel int
+
 const (
 	_ LogLevel = iota * 10
 	TRACE
@@ -43,11 +44,11 @@ func (l LogLevel) MarshalJSON() ([]byte, error) {
 
 // FollowerLog structures log output from Nomad Follower and dead letters.
 type FollowerLog struct {
-	Name string `json:"name"`
-	Message string `json:"message"`
-	Datetime string `json:"datetime"`
-	Level LogLevel `json:"log_level,string"`
-	Data map[string]interface{} `json:"data"`
+	Name     string                 `json:"name"`
+	Message  string                 `json:"message"`
+	Datetime string                 `json:"datetime"`
+	Level    LogLevel               `json:"log_level,string"`
+	Data     map[string]interface{} `json:"data"`
 }
 
 func (f FollowerLog) String() string {

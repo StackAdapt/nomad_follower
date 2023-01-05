@@ -14,11 +14,11 @@ type FollowedAllocation struct {
 	Quit       chan struct{}
 	Tasks      []*FollowedTask
 	log        Logger
-	logTag     string
+	skipLogTag string
 }
 
 //NewFollowedAllocation creates a new followed allocation
-func NewFollowedAllocation(alloc *nomadApi.Allocation, nomad NomadConfig, outChan chan string, logger Logger, logTag string) *FollowedAllocation {
+func NewFollowedAllocation(alloc *nomadApi.Allocation, nomad NomadConfig, outChan chan string, logger Logger, skipLogTag string) *FollowedAllocation {
 	return &FollowedAllocation{
 		Alloc:      alloc,
 		Nomad:      nomad,
@@ -26,7 +26,7 @@ func NewFollowedAllocation(alloc *nomadApi.Allocation, nomad NomadConfig, outCha
 		Quit:       make(chan struct{}),
 		Tasks:      make([]*FollowedTask, 0),
 		log:        logger,
-		logTag:     logTag,
+		skipLogTag: skipLogTag,
 	}
 }
 
@@ -41,10 +41,10 @@ func (f *FollowedAllocation) Start(save *SavedAlloc) {
 	for _, tg := range f.Alloc.Job.TaskGroups {
 		for _, task := range tg.Tasks {
 			ft := NewFollowedTask(f.Alloc, *tg.Name, task, f.Nomad, f.Quit, f.OutputChan, f.log)
-			skip := true
+			skip := false
 			for _, s := range ft.logTemplate.ServiceTags {
-				if s == f.logTag {
-					skip = false
+				if s == f.skipLogTag {
+					skip = true
 				}
 			}
 			if !skip {

@@ -454,6 +454,27 @@ func (ft *FollowedTask) processFrame(frame *nomadApi.StreamFrame, streamState St
 			}
 		}
 	}
+	if len(streamState.MultiLineBuf) != 0 {
+		ft.log.Tracef(
+			logContext,
+			"Flushing multiline:\n%s\n at the end of processFrame",
+			streamState.MultiLineBuf,
+		)
+		l := createJsonLog(ft.logTemplate, streamState.MultiLineBuf, streamState.LastTimestamp)
+		s, err := l.ToJSON()
+		if err != nil {
+			ft.log.DeadLetterf(
+				logContext,
+				l,
+				"Error building json log message: %v",
+				err,
+			)
+		} else {
+			jsons = append(jsons, s)
+		}
+		streamState.BufReset()
+	}
+
 	return jsons, streamState
 }
 
